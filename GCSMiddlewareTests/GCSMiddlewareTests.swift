@@ -1,0 +1,55 @@
+//
+//  GCSMiddlewareTests.swift
+//  GCSMiddlewareTests
+//
+//  Created by Greg Neagle on 5/17/25.
+//
+
+import Foundation
+import Testing
+
+struct GCSMiddlewareTests {
+    @Test func generateSignedUrlReturnsExpected() {
+        let expectedURL = "https://storage.googleapis.com/foo/bar?GoogleAccessId=readonly@double.iam.gserviceaccount.com&Expires=1747270308&Signature=Hga23aNsQKDiLUceCarzz1UQvwOHQMNNunWAFpmIy%2FNwTb%2BfSXz97jXMnWpH16oQLA%2BJZ%2BskeyE3jg8%2FLBdO9Vq6eCdxAaAo%2Fh5UKIgq8jGLd2DqzkLWLYkd77VimhbQdspa5yHz3GSVinYncgfke%2FwdRgqQorTJix33AykskNR7osQD0jrAqvr8tXONm%2F2nbueIEjwCjoTJ%2FDWa3eetKzffCE4vlIl2aQWxQ%2BkwlkY3UdWQa1a%2FGdGGf5axxbZ4OdROJdGTPXP4VfId2XK0PMKZPc2sjO1Mw%2Fzvq211dkEtmiNQ3Yik4PbI80xv3ytONthVENOR9KArRcAQcE3eAw%3D%3D"
+        let url = "https://storage.googleapis.com/foo/bar"
+        let clientId = "readonly@double.iam.gserviceaccount.com"
+        let expiration = 1_747_270_308
+        if let key = rsaPrivateKeyFromPemString(RSA_PRIVATE_KEY_STRING),
+           let signedURL = generateSignedUrl(
+               url,
+               withKey: key,
+               clientId: clientId,
+               expiration: expiration,
+           )
+        {
+            #expect(signedURL == expectedURL)
+        } else {
+            #expect(Bool(false))
+        }
+    }
+
+    @Test func readJsonKeystoreTest() {
+        let jsonString = """
+        {
+          "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDHKwHZ7i5V+w6U\\n0ku/XhYE2/PYgV9Yrgtso3LNaA4uHJjvO5JCdcM7wje1hLKI6ANZfQ/bKXghPq8M\\nSVgfUZUYOe97ztmJlVe+LvhIyTY9eyk9NDBytAvrARKn+ceGiac8S3QUDXYlGif1\\nUIUdFsuLKSbtnibOWztV4gjYFE/Yw9mrjADq4S4e/8BZVSEpPOct2hcEXR+1ixzG\\nlwFaUY5WlaxonazyKZ40p+Evu6T4fCLP71Uo9ewXjeHy7vqL4dHpfxVBXecUVaMK\\n5XC0FAKNTZDrEjbVqXmSNRnOw46DjYyOYfvaOFhBoSBpRX/gzOZgyZsvqqgAl3Qr\\nTXe3xdm5AgMBAAECggEBAJuYNq8Jiztykfajv7d2Cl+rcfm/QDyoY5ZwrpxX4VQW\\n1Ud4U5AGLgq+dQUi8NNR5mP/9uYxpH7cWKaRmf2Fn6O4hyZC9+GrQUv7p849G1m2\\noQYGgp7pl7H1OZzu3vh1C6hoDfwodBcSMwtL52JNT6Cc+qOB/TETRuyWVHByldpx\\n7N/Ud7hfjV2bJxFG5d33Io0lYB6l/179jZCLow33hkSfQBfsgdP75WWl8nB7pLMj\\nbwJlu3j2NhMIXRIWOuc+QPP13qbg+nqnOlBQjoh7UYqI2bACYyERFpWYygsTQR1N\\nrLE8kbsj91twRLboEpt+gKY0veItlLIp3zsNEKkMmh0CgYEA9N8Twb6dFX+BYs0g\\n0NaXSHx/sFZRfIzFbvIN/HbjTGxvE32e3Fq3FtF/sgelV3flUBgN+tRKUjhNd/wD\\nYHB1wvGLcPe5cyQdFGsaU2mZPocwJ8FYm/vUZK1LNw2HTyQ/ELntQDfAzX6DJ6tM\\n9cPYB3lW5VR2bYkZ1gqE+KjIPwsCgYEA0DgzOkia7d8Tx6wvZd+6zX9OuXs6l9le\\n+q+sarKG3y1POsPmz4JVVh0YCJBNwgaSM8k4z2ogl9nPL6qIRmxRYci7UAWz8kcV\\nhs+zMyBMqioDfTqlHSGVKYBMvpb873Pz+hpSL/u9fvR1vNM1E/96+40VmR25Fiwd\\nyzltXGmNFMsCgYEA03IZrlA5doneoQE+V/clNUuEOzGeNa2dArtzhlDm32Q22h68\\nYczXkpWe7Y0aohf+5JWQ5MoRz0Oc6YGtLMaPeaF35jmTYrCJh8sgNWzXDh5QX9Pd\\n/vuLINBfRY+iCp3i8z+Jdc1u6ENZX5TU5NeTIIkPlwHDLbyYmbIFtm6QU5cCgYEA\\nhdO5STqlKUH5qppGlImpvK6YYKqNTE/Ptfv3K1S3TvYGOFT1ImY4hvKIIejtsUkb\\n6uDn/JfPfwnlGlPW5rxzyg+EJLiloZCCi3UvTiryW2RJfdGVkhWlk1j8+np880Jp\\ni1QjguegMdrZWZW+Ra4s00UonpL2BQQx2g589ap5nOUCgYEAqlnyM6s4BhNSB2aj\\nzgq3xJsxNkwulIeNu8+oic65G/I5VhTTwsOE9sM97kEWJ3XZorIAnEK/LhQhADpF\\nvfEjbm0riFBGrr97mqjpZxNbnrgXVEpwCTw1sPzdOjZ0/iHjA9Q+O8Euuq1ODzxA\\naC+Vqg2/bx7djcVtTp0KqyFwuHY=\\n-----END PRIVATE KEY-----\\n",
+          "client_email": "readonly@double.iam.gserviceaccount.com"
+        }
+
+        """
+        let jsonFilePath = "/tmp/gcs.json"
+        // create a temporary file to read
+        if FileManager.default.createFile(
+            atPath: jsonFilePath,
+            contents: jsonString.data(using: .utf8),
+            attributes: nil
+        ),
+            let (_, clientId) = readJsonKeystore(jsonFilePath)
+        {
+            #expect(clientId == "readonly@double.iam.gserviceaccount.com")
+        } else {
+            #expect(Bool(false))
+        }
+        // clean up that temp file
+        try? FileManager.default.removeItem(atPath: jsonFilePath)
+    }
+}
