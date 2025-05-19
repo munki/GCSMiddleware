@@ -9,7 +9,7 @@ check_exit_code() {
 }
 
 TOOL="GCSMiddleware"
-VERSION="3.0"
+VERSION="3.0.0"
 
 # find the Xcode project
 THISDIR=$(dirname "$0")
@@ -17,6 +17,11 @@ PROJ="${THISDIR}/${TOOL}.xcodeproj"
 if [ ! -e "${PROJ}" ] ; then
     check_exit_code 1 "${PROJ} doesn't exist"
 fi
+
+# generate a revision number for from the list of Git revisions
+GITREV=$(git log -n1 --format="%H" -- "${PROJ}")
+GITREVINDEX=$(git rev-list --count "$GITREV")
+VERSION="${VERSION}.${GITREVINDEX}"
 
 # make sure we have a build directory to use
 BUILD_DIR="${THISDIR}/build"
@@ -34,7 +39,6 @@ xcodebuild \
     build 1>/dev/null
 
 check_exit_code "$?" "Error building ${TOOL}.plugin"
-cp "${BUILD_DIR}/Build/Products/Release/${TOOL}.plugin" "${BINARIES_DIR}/"
 
 # build a pkg (component pkg for now)
 
