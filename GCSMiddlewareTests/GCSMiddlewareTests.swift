@@ -16,7 +16,7 @@ class GCSMiddlewareTests {
         let expiration = 1_747_270_308
         let key = rsaPrivateKeyFromPemString(RSA_PRIVATE_KEY_STRING)
         let unwrappedKey = try #require(key, "Could not load RSA private key from PEM string")
-        
+
         let signedURL = generateSignedUrl(
             url,
             withKey: unwrappedKey,
@@ -25,15 +25,16 @@ class GCSMiddlewareTests {
         )
         #expect(signedURL == expectedURL)
     }
-    
+
     // Make sure we can parse the gcs.json file
     @Test func readJsonKeyStore() throws {
         let jsonURL = Bundle(for: type(of: self)).url(forResource: "gcs", withExtension: "json")
         let jsonPath = try #require(jsonURL?.path, "Could not get file URL for gcs.json")
-        
+
         // readJsonKeystore result is an optional tuple of (SecKey, String)
         let result = readJsonKeystore(jsonPath)
-        #expect(result?.0 != nil)
-        #expect(result?.1 == "readonly@double.iam.gserviceaccount.com")
+        #expect(result?.0 != nil, "Failed to load private key from gcs.json")
+        #expect(result?.1 == "readonly@double.iam.gserviceaccount.com",
+                "Failed to read expected clientID from gcs.json")
     }
 }
