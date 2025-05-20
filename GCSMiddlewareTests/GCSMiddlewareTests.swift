@@ -8,6 +8,23 @@
 import Foundation
 import Testing
 
+/// We use this to find bundled testing resources (files used as fixtures)
+class TestingResource {
+    /// Return a file URL for a bundled test file
+    static func url(for resource: String) -> URL? {
+        let name = (resource as NSString).deletingPathExtension
+        let ext = (resource as NSString).pathExtension
+        return Bundle(for: self).url(forResource: name, withExtension: ext)
+    }
+    
+    /// Return a path for a bundled test file
+    static func path(for resource: String) -> String? {
+        let name = (resource as NSString).deletingPathExtension
+        let ext = (resource as NSString).pathExtension
+        return Bundle(for: self).path(forResource: name, ofType: ext)
+    }
+}
+
 class GCSMiddlewareTests {
     @Test func generateSignedUrlReturnsExpected() throws {
         let expectedURL = "https://storage.googleapis.com/foo/bar?GoogleAccessId=readonly@double.iam.gserviceaccount.com&Expires=1747270308&Signature=Hga23aNsQKDiLUceCarzz1UQvwOHQMNNunWAFpmIy%2FNwTb%2BfSXz97jXMnWpH16oQLA%2BJZ%2BskeyE3jg8%2FLBdO9Vq6eCdxAaAo%2Fh5UKIgq8jGLd2DqzkLWLYkd77VimhbQdspa5yHz3GSVinYncgfke%2FwdRgqQorTJix33AykskNR7osQD0jrAqvr8tXONm%2F2nbueIEjwCjoTJ%2FDWa3eetKzffCE4vlIl2aQWxQ%2BkwlkY3UdWQa1a%2FGdGGf5axxbZ4OdROJdGTPXP4VfId2XK0PMKZPc2sjO1Mw%2Fzvq211dkEtmiNQ3Yik4PbI80xv3ytONthVENOR9KArRcAQcE3eAw%3D%3D"
@@ -28,8 +45,8 @@ class GCSMiddlewareTests {
 
     // Make sure we can parse the gcs.json file
     @Test func readJsonKeyStore() throws {
-        let jsonURL = Bundle(for: type(of: self)).url(forResource: "gcs", withExtension: "json")
-        let jsonPath = try #require(jsonURL?.path, "Could not get file URL for gcs.json")
+        let jsonPath = try #require(TestingResource.path(for: "gcs.json"),
+                                    "Could not get path for gcs.json")
 
         // readJsonKeystore result is an optional tuple of (SecKey, String)
         let result = readJsonKeystore(jsonPath)
