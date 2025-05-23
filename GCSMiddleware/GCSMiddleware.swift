@@ -69,9 +69,9 @@ func buildSignedGCSurl(_ url: String) -> String? {
     // paths to search for gcs.json
     let filepaths = [
         (Bundle.main.bundlePath as NSString).appendingPathComponent("middleware/gcs.json"),
-        (Bundle.main.bundlePath as NSString).appendingPathComponent("gcs.json")
+        (Bundle.main.bundlePath as NSString).appendingPathComponent("gcs.json"),
     ]
-    for path in filepaths  {
+    for path in filepaths {
         if FileManager.default.fileExists(atPath: path),
            let (key, clientId) = readJsonKeystore(path)
         {

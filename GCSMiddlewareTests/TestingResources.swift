@@ -15,7 +15,7 @@ class TestingResource {
         let ext = (resource as NSString).pathExtension
         return Bundle(for: self).url(forResource: name, withExtension: ext)
     }
-    
+
     /// Return a path for a bundled test file
     static func path(for resource: String) -> String? {
         let name = (resource as NSString).deletingPathExtension
