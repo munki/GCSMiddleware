@@ -66,9 +66,17 @@ func readJsonKeystore(_ path: String) -> (SecKey, String)? {
 func buildSignedGCSurl(_ url: String) -> String? {
     // expiration is 15 minutes from now
     let expiration = Int(Date().timeIntervalSince1970) + 15 * 60
-    let jsonFile = (Bundle.main.bundlePath as NSString).appendingPathComponent("middleware/gcs.json")
-    if let (key, clientId) = readJsonKeystore(jsonFile) {
-        return generateSignedUrl(url, withKey: key, clientId: clientId, expiration: expiration)
+    // paths to search for gcs.json
+    let filepaths = [
+        (Bundle.main.bundlePath as NSString).appendingPathComponent("middleware/gcs.json"),
+        (Bundle.main.bundlePath as NSString).appendingPathComponent("gcs.json")
+    ]
+    for path in filepaths  {
+        if FileManager.default.fileExists(atPath: path),
+           let (key, clientId) = readJsonKeystore(path)
+        {
+            return generateSignedUrl(url, withKey: key, clientId: clientId, expiration: expiration)
+        }
     }
     return nil
 }
