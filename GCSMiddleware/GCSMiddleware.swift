@@ -40,7 +40,11 @@ func generateSignedUrl(
         ]
         if let queryString = encodeQueryItems(queryItems) {
             return "https://storage.googleapis.com\(path)\(queryString)"
+        } else {
+            print("ERROR: Could not encode query items")
         }
+    } else {
+        print("ERROR: could not sign request")
     }
     return nil
 }
@@ -78,6 +82,7 @@ func buildSignedGCSurl(_ url: String) -> String? {
             return generateSignedUrl(url, withKey: key, clientId: clientId, expiration: expiration)
         }
     }
+    print("ERROR: no success at reading a gcs.json file")
     return nil
 }
 
