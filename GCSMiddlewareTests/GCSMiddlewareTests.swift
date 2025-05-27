@@ -37,4 +37,17 @@ struct GCSMiddlewareTests {
         #expect(result?.1 == "readonly@double.iam.gserviceaccount.com",
                 "Failed to read expected clientID from gcs.json")
     }
+    
+    /// Test that a non-GCS request is returned unmodified
+    @Test func nonGCSRequestShouldNotBeModified() async throws {
+        let request = MunkiMiddlewareRequest(
+            url: "https://example.com",
+            headers: [:]
+        )
+        // currently MunkiMiddlewareRequest structs are not directly comparable, so we''ll just
+        // compare the instance variables
+        let processedRequest = GCSMiddleware().processRequest(request)
+        #expect(processedRequest.url == request.url)
+        #expect(processedRequest.headers == request.headers)
+    }
 }
