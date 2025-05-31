@@ -8,7 +8,7 @@
 import Foundation
 import Security
 
-// Some notes on loading provate keys from PEM data
+// Some notes on loading private keys from PEM data
 // https://developer.apple.com/forums/thread/680572
 // https://developer.apple.com/forums/thread/680554
 // https://developer.apple.com/forums/thread/773777
