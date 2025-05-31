@@ -37,7 +37,7 @@ struct GCSMiddlewareTests {
         #expect(result?.1 == "readonly@double.iam.gserviceaccount.com",
                 "Failed to read expected clientID from gcs.json")
     }
-    
+
     /// Test that a non-GCS request is returned unmodified
     @Test func nonGCSRequestShouldNotBeModified() async throws {
         let request = MunkiMiddlewareRequest(
