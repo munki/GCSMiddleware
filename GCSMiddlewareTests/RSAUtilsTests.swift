@@ -15,9 +15,31 @@ struct RSAUtilsTests {
         #expect(keyData != nil)
     }
 
+    /// Tests that we can extract private key data from a PEM string containing an RSA PRIVATE KEY (PKCS#1)
+    /// where the string line breaks are CRLF (typical Windows line breaks)
+    @Test func getRSAPrivateKeyDataFromPEMwithCRLFendings() {
+        // change the line endings to CRLFs
+        let pemString = RSA_PRIVATE_KEY_STRING
+            .split(separator: "\n")
+            .joined(separator: "\r\n")
+        let keyData = privateKeyDataFromPEM(pemString)
+        #expect(keyData != nil)
+    }
+
     /// Tests that we can extract private key data from a PEM string containing a PRIVATE KEY (PKCS#8)
     @Test func getPKCS8PrivateKeyDataFromPEM() {
         let keyData = privateKeyDataFromPEM(PRIVATE_KEY_STRING)
+        #expect(keyData != nil)
+    }
+
+    /// Tests that we can extract private key data from a PEM string containing an PRIVATE KEY (PKCS#8)
+    /// where the string line breaks are CRLF (typical Windows line breaks)
+    @Test func getPKCS8PrivateKeyDataFromPEMwithCRLFendings() {
+        // change the line endings to CRLFs
+        let pemString = PRIVATE_KEY_STRING
+            .split(separator: "\n")
+            .joined(separator: "\r\n")
+        let keyData = privateKeyDataFromPEM(pemString)
         #expect(keyData != nil)
     }
 

@@ -38,7 +38,10 @@ func dataFromPEM(_ pem: String, startTag: String, endTag: String) -> Data? {
     else {
         return nil
     }
-    let keyDataBase64 = String(pem[startIndex ..< endIndex]).split(separator: "\n").joined()
+    let keyDataBase64 = String(pem[startIndex ..< endIndex])
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+        .components(separatedBy: .newlines)
+        .joined()
     guard let keyData = Data(base64Encoded: keyDataBase64) else {
         return nil
     }
