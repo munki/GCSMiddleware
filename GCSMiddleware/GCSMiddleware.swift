@@ -28,8 +28,11 @@ func generateSignedUrl(
     clientId: String,
     expiration: Int
 ) -> String? {
-    guard let parsedURL = URL(string: url) else { return nil }
-    let path = parsedURL.path
+    guard let components = URLComponents(string: url) else {
+        print("ERROR: could parse URL string")
+        return nil
+    }
+    let path = components.percentEncodedPath
     let toSign = "GET\n\n\n\(expiration)\n\(path)"
     if let signature = signSHA256(Data(toSign.utf8), withKey: key) {
         let signatureString = signature.base64EncodedString()
